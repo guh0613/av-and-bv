@@ -21,6 +21,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.HashMap;
 
@@ -37,11 +38,13 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private TextInputEditText avtobv;
     private TextInputEditText bvtoav;
+    private TextInputLayout avinput;
+    private TextInputLayout bvinput;
     private ClipboardManager cm;
     private ClipData mClipData;
 
     //现在，定义av号和bv号互转的方法
-    //定义一个power乘方方法
+    //定义一个power乘方方法，这是转换进制必要的
     public static long power(int a, int b) {
         long power = 1;
         for (int c = 0; c < b; c++)
@@ -130,49 +133,102 @@ public class MainActivity extends AppCompatActivity {
 
     //现在，指定转换按钮的点击事件
     public void atb(View view) {   //av号转换bv号
+        avinput = findViewById(R.id.textInputLayoutav);
         avtobv = (TextInputEditText) findViewById(R.id.avn);
         String av = avtobv.getText().toString();
-        try {
-
-
-            final String bv = v2b("av" + av);
-            Snackbar.make(view, "BV号是：" + bv, Snackbar.LENGTH_SHORT)
-                    .setAction("复制", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            mClipData = ClipData.newPlainText("Label", bv);
-                            cm.setPrimaryClip(mClipData);
-                            Toast.makeText(MainActivity.this, "已经复制到剪切板了", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Snackbar.make(view, "你输入的av号有误", Snackbar.LENGTH_SHORT).show();
+        long avn1 = Long.parseLong(av);
+        //av号是绝对不可能大于2的32次方的，不然此算法也将作废
+        if (avn1 >= Math.pow(2, 32)) {
+            Snackbar.make(view, "你输的数也太大了点吧喂！", Snackbar.LENGTH_SHORT).show();
+            avinput.setError("你输的数也太大了点吧喂！");
+            avinput.setErrorEnabled(true);
+        } else {
+            try {
+                avinput.setErrorEnabled(false);
+                final String bv = v2b("av" + av);
+                Snackbar.make(view, "BV号是：" + bv, Snackbar.LENGTH_SHORT)
+                        .setAction("复制", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                mClipData = ClipData.newPlainText("Label", bv);
+                                cm.setPrimaryClip(mClipData);
+                                Toast.makeText(MainActivity.this, "已经复制到剪切板了", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                avinput.setError("你输入的av号有误");
+                avinput.setErrorEnabled(true);
+                Snackbar.make(view, "你输入的av号有误", Snackbar.LENGTH_SHORT).show();
+            }
         }
     }
 
     public void bta(View view) {   //bv号转换av号
+        bvinput = findViewById(R.id.textInputLayoutbv);
         bvtoav = (TextInputEditText) findViewById(R.id.bvn);
         String bv = bvtoav.getText().toString();
-        try {
-            final String av = b2v("BV" + bv);
-            Snackbar.make(view, "av号是：" + av, Snackbar.LENGTH_SHORT)
-                    .setAction("复制", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            mClipData = ClipData.newPlainText("Label", av);
-                            cm.setPrimaryClip(mClipData);
-                            Toast.makeText(MainActivity.this, "已经复制到剪切板了", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Snackbar.make(view, "你输入的bv号有误", Snackbar.LENGTH_SHORT).show();
-        }
+        if (bv.startsWith("BV")) {//先看看你有没有把bv带进来
+            char bv7 = bv.charAt(9);
+            //判断bv号的格式是否正确，防止你瞎输
+            if ((bv.indexOf("1") == 2) && (bv7 == '7'))
+                try {
+                    avinput.setErrorEnabled(false);
+                    final String av = b2v(bv);
+                    Snackbar.make(view, "av号是：" + av, Snackbar.LENGTH_SHORT)
+                            .setAction("复制", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                    mClipData = ClipData.newPlainText("Label", av);
+                                    cm.setPrimaryClip(mClipData);
+                                    Toast.makeText(MainActivity.this, "已经复制到剪切板了", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    bvinput.setErrorEnabled(true);
+                    bvinput.setError("你输入的bv号有误");
+                    Snackbar.make(view, "你输入的bv号有误", Snackbar.LENGTH_SHORT).show();
+                }
+            else {//如果格式不对的话就揍你一顿
+                bvinput.setErrorEnabled(true);
+                bvinput.setError("你输入的bv号有误");
+                Snackbar.make(view, "你输入的bv号有误", Snackbar.LENGTH_SHORT).show();
+            }
+        } else {//如果你不是用bv开头的
+            char bv7 = bv.charAt(7);
+            //判断格式是否正确
+            if ((bv.indexOf("1") == 0) && (bv7 == '7'))
+                try {
+                    avinput.setErrorEnabled(false);
+                    final String av = b2v("BV" + bv);
+                    Snackbar.make(view, "av号是：" + av, Snackbar.LENGTH_SHORT)
+                            .setAction("复制", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                    mClipData = ClipData.newPlainText("Label", av);
+                                    cm.setPrimaryClip(mClipData);
+                                    Toast.makeText(MainActivity.this, "已经复制到剪切板了", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    bvinput.setErrorEnabled(true);
+                    bvinput.setError("你输入的bv号有误");
+                    Snackbar.make(view, "你输入的bv号有误", Snackbar.LENGTH_SHORT).show();
+                }
+            else {//格式不对就揍你一顿
+                bvinput.setErrorEnabled(true);
+                bvinput.setError("你输入的bv号有误");
+                Snackbar.make(view, "你输入的bv号有误", Snackbar.LENGTH_SHORT).show();
+            }
 
+        }
     }
 }
