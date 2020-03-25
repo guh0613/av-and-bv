@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">刻在DNA里的av号</string>
+    <string name="navigation_drawer_open">菜单</string>
+    <string name="navigation_drawer_close">关闭菜单</string>
+    <string name="nav_header_title">不要什么都往DNA里刻啊！</string>
+    <string name="nav_header_subtitle">版本：1.0</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+
+    <string name="menu_slideshow">av号转bv号</string>
+    <string name="menu_tools">bv号转av号</string>
+    <string name="bv_bv_bv17x411w7kc">输入bv号....（请输入“BV”之后的部分，如：BV17x411w7KC）</string>
+    <string name="av_av_170001">输入av号....(只需要输入数字，不要带“av”，如：170001）</string>
+
+</resources>
