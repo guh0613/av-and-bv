@@ -25,10 +25,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-
+//这里是由知乎大佬不知道用什么方法得出的转换用数字
     static int ss[] = {11, 10, 3, 8, 4, 6, 2, 9, 5, 7};
-    static long xor = 177451812;
-    static long add = 8728348608l;
+    static long xor = 177451812; //二进制时加减数1
+    static long add = 8728348608l;//十进制时加减数2
     //变量初始化工作，加载哈希表
     private static String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
     private static HashMap<String, Integer> mp = new HashMap<>();
@@ -41,15 +41,17 @@ public class MainActivity extends AppCompatActivity {
     private ClipData mClipData;
 
     //现在，定义av号和bv号互转的方法
+    //定义一个power乘方方法
     public static long power(int a, int b) {
         long power = 1;
         for (int c = 0; c < b; c++)
             power *= a;
         return power;
     }
-
+//bv转av方法
     public static String b2v(String s) {
         long r = 0;
+        //58进制转换
         for (int i = 0; i < 58; i++) {
             String s1 = table.substring(i, i + 1);
             mp.put(s1, i);
@@ -57,13 +59,16 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 6; i++) {
             r = r + mp.get(s.substring(ss[i], ss[i] + 1)) * power(58, i);
         }
+        //转换完成后，需要处理，带上两个随机数
         return "av" + ((r - add) ^ xor);
     }
-
+//av转bv方法
     public static String v2b(String st) {
         long s = Long.valueOf(st.split("av")[1]);
         StringBuffer sb = new StringBuffer("BV1  4 1 7  ");
+        //逆向思路，先将随机数还原
         s = (s ^ xor) + add;
+        //58进制转回
         for (int i = 0; i < 58; i++) {
             String s1 = table.substring(i, i + 1);
             mp2.put(i, s1);
@@ -74,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return sb.toString();
     }
-
+//活动的oncreate方法
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,14 +99,14 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
     }
-
+//fragment控制器
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
+//初始化菜单
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -109,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    //init the menu on click now
+    //设定点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
