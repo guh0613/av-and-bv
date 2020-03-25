@@ -6,12 +6,13 @@
     "apkData": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 1,
-      "versionName": "1.0",
+      "versionCode": 3,
+      "versionName": "1.3",
       "enabled": true,
       "outputFile": "app-release.apk",
       "fullName": "release",
-      "baseName": "release"
+      "baseName": "release",
+      "dirName": ""
     },
     "path": "app-release.apk",
     "properties": {}
